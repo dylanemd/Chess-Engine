@@ -67,16 +67,6 @@ In `main.py`, you can adjust:
 - `HUMAN_COLOR` and `COMPUTER_COLOR`: set these to opposite colors, `"White"` and `"Black"`. If you choose Black, the computer makes the first move. The board still has White at the bottom.
 - `ENGINE_DEPTH`: the number of plies to search, currently `3`. A ply is one move by either player. Use a value of at least `1`. Increasing it searches further ahead but takes longer.
 
-## Tests
-
-Run the rule and engine tests from the project folder:
-
-```bash
-python -m unittest test_chess
-```
-
-These tests do not need Pygame or the piece images.
-
 ## Known limitations
 
 - The computer always promotes to a queen. The search also assumes queen promotion when considering the human player's replies.
