@@ -58,7 +58,6 @@ The computer searches in the background, so the window still responds while it t
 | `game_state.py` | `GameState` class: board setup, move application, promotion, turn tracking |
 | `renderer.py` | Drawing the board, pieces, move highlights, and promotion prompt |
 | `engine.py` | Minimax search with alpha-beta pruning for the computer opponent |
-| `test_chess.py` | Tests for move rules, special moves, and search results |
 
 ## Configuring the engine
 
