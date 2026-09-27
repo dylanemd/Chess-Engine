@@ -8,6 +8,10 @@ PIECE_VALUES = {
 }
 
 
+class SearchCancelled(Exception):
+    pass
+
+
 # Positive Score favors White
 # Negative Score favors Black
 def evaluate(board):
@@ -71,14 +75,14 @@ def apply_move(board, piece, move, en_passant_target):
     return None
 
 
-def minimax(board, depth, alpha, beta, maximizing, en_passant_target):
+def minimax(board, depth, alpha, beta, maximizing, en_passant_target, cancel_event=None):
+    if cancel_event is not None and cancel_event.is_set():
+        raise SearchCancelled()
+
     if maximizing:
         color = "White"
     else:
         color = "Black"
-
-    if depth == 0:
-        return evaluate(board), None
 
     best_move = None
     if maximizing:
@@ -92,11 +96,15 @@ def minimax(board, depth, alpha, beta, maximizing, en_passant_target):
         for move in rules.get_legal_moves(piece, board, en_passant_target):
             any_legal_move = True
 
+            # Check that the game can continue before using the material score.
+            if depth == 0:
+                return evaluate(board), None
+
             board_copy = copy.deepcopy(board)
             piece_copy = board_copy[piece.position[1]][piece.position[0]]
             new_ep = apply_move(board_copy, piece_copy, move, en_passant_target)
 
-            score, _ = minimax(board_copy, depth - 1, alpha, beta, not maximizing, new_ep)
+            score, _ = minimax(board_copy, depth - 1, alpha, beta, not maximizing, new_ep, cancel_event)
 
             if maximizing:
                 if score > best_score:
@@ -125,10 +133,13 @@ def minimax(board, depth, alpha, beta, maximizing, en_passant_target):
     return best_score, best_move
 
 
-def choose_move(board, color, en_passant_target, depth=2):
+def choose_move(board, color, en_passant_target, depth=2, cancel_event=None):
+    if depth < 1:
+        raise ValueError("Search depth must be at least 1")
+
     if color == "White":
         maximizing = True
     else:
         maximizing = False
-    _ , best_move = minimax(board, depth, float("-inf"), float("inf"), maximizing, en_passant_target)
+    _, best_move = minimax(board, depth, float("-inf"), float("inf"), maximizing, en_passant_target, cancel_event)
     return best_move

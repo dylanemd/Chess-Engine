@@ -53,7 +53,7 @@ class GameState:
             self.board[0][col] = black_piece
             self.black_pieces.append(black_piece)
  
-    # --- rules delegation -------------------------------------------------
+    # Rules
  
     def get_legal_moves(self, piece):
         return rules.get_legal_moves(piece, self.board, self.en_passant_target)
@@ -75,7 +75,7 @@ class GameState:
             pieces_list = self.black_pieces
         return rules.is_stalemate(self.board, color, pieces_list, self.en_passant_target)
  
-    # --- mutation -----------------------------------------------------------
+    # Mutation
  
     def move_piece(self, piece, new_position):
         x, y = piece.position
@@ -129,7 +129,7 @@ class GameState:
         else:
             self.black_pieces.remove(piece)
  
-    # --- promotion -----------------------------------------------------
+    # Promotion
  
     PROMOTION_CLASSES = {"Queen": Queen, "Rook": Rook, "Bishop": Bishop, "Knight": Knight}
  

@@ -5,7 +5,13 @@ def is_square_attacked(board, x, y, by_color):
     for row in board:
         for piece in row:
             if piece is not None and piece.color == by_color:
-                if (x, y) in piece.possibleMoves(board):
+                if piece.type == "Pawn":
+                    pawn_x, pawn_y = piece.position
+                    direction = -1 if piece.color == "White" else 1
+                    # Pawns attack diagonally, even when the square is empty.
+                    if y == pawn_y + direction and abs(x - pawn_x) == 1:
+                        return True
+                elif (x, y) in piece.possibleMoves(board):
                     return True
     return False
 
@@ -32,7 +38,7 @@ def get_castling_moves(board, color):
     king = board[row][4]
     moves = []
 
-    if king is None or king.type != "King" or king.has_moved:
+    if king is None or king.type != "King" or king.color != color or king.has_moved:
         return moves
     if is_check(board, color):
         return moves
@@ -44,7 +50,7 @@ def get_castling_moves(board, color):
 
     # Kingside 
     rook = board[row][7]
-    if rook is not None and rook.type == "Rook" and not rook.has_moved:
+    if rook is not None and rook.type == "Rook" and rook.color == color and not rook.has_moved:
         if board[row][5] is None and board[row][6] is None:
             if not is_square_attacked(board, 5, row, enemy_color) and \
                not is_square_attacked(board, 6, row, enemy_color):
@@ -52,7 +58,7 @@ def get_castling_moves(board, color):
 
     # Queenside 
     rook = board[row][0]
-    if rook is not None and rook.type == "Rook" and not rook.has_moved:
+    if rook is not None and rook.type == "Rook" and rook.color == color and not rook.has_moved:
         if board[row][1] is None and board[row][2] is None and board[row][3] is None:
             if not is_square_attacked(board, 2, row, enemy_color) and \
                not is_square_attacked(board, 3, row, enemy_color):
@@ -66,10 +72,14 @@ def get_legal_moves(piece, board, en_passant_target=None):
     possible_moves = piece.possibleMoves(board, en_passant_target)
 
     for move in possible_moves:
+        new_x, new_y = move
+        target = board[new_y][new_x]
+        if target is not None and target.type == "King":
+            continue
+
         board_copy = copy.deepcopy(board)
         piece_copy = board_copy[piece.position[1]][piece.position[0]]
         x, y = piece_copy.position
-        new_x, new_y = move
 
         if piece.type == "Pawn" and move == en_passant_target and board_copy[new_y][new_x] is None:
             board_copy[y][new_x] = None
